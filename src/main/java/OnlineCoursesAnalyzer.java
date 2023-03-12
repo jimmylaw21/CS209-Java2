@@ -1,17 +1,17 @@
-package Assignment1;
-
 import java.io.*;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-//use techniques such as Collections, Lambda, and Streams, which we've covered in the lectures.
 public class OnlineCoursesAnalyzer {
     private final List<Course> courses;
     private final Set<String> instuctors;
     public OnlineCoursesAnalyzer(String datasetPath) {
         courses = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(datasetPath))) {
+        // read CSV file Using UTF-8 encoding
+
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(
+                new FileInputStream(datasetPath),"UTF-8"))) {
             // skip header
             br.readLine();
             String line;
@@ -24,7 +24,7 @@ public class OnlineCoursesAnalyzer {
                         parseDate(values[2]),
                         values[3],
                         Arrays.asList(values[4].split(",")),
-                        values[5],
+                        values[5].replace("\"",""),
                         Integer.parseInt(values[6]),
                         Boolean.parseBoolean(values[7]),
                         Integer.parseInt(values[8]),
@@ -77,9 +77,6 @@ public class OnlineCoursesAnalyzer {
         return list.toArray(new String[0]);
     }
 
-    //    This method returns a <institution, count> map, where the key is the institution while the value is the
-    //    total number of participants who have accessed the courses of the institution.
-    //    The map should be sorted by the alphabetical order of the institution.
     public Map<String, Integer> getPtcpCountByInst(){
         return courses.stream()
                 .collect(Collectors.groupingBy(Course::getInstitution, Collectors.summingInt(Course::getParticipantsCount)))
@@ -97,7 +94,7 @@ public class OnlineCoursesAnalyzer {
         return courses.stream()
                 .collect(Collectors.groupingBy(course -> course.getInstitution() + "-" + course.getCourseSubject(), Collectors.summingInt(Course::getParticipantsCount)))
                 .entrySet().stream()
-                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed().thenComparing(Map.Entry.comparingByKey()))
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> a, LinkedHashMap::new));
     }
 //    An instructor may be responsible for multiple courses, including independently responsible courses and codeveloped courses.
@@ -266,24 +263,6 @@ public class OnlineCoursesAnalyzer {
         }
     }
 
-    public static void main(String[] args) {
-//        OnlineCoursesAnalyzer analyzer = new OnlineCoursesAnalyzer("C:\\Users\\jimmylaw21\\OneDrive - 南方科技大学\\桌面\\CS209 java2\\src\\main\\java\\Assignment1\\local.csv");
-        OnlineCoursesAnalyzer analyzer = new OnlineCoursesAnalyzer("local.csv");
-//        System.out.println(analyzer.getPtcpCountByInst());
-//        System.out.println(analyzer.getPtcpCountByInstAndSubject());
-//        System.out.println(analyzer.getCourseListOfInstructor());
-//        System.out.println(analyzer.getCourses(10, "hours"));
-//        System.out.println(analyzer.searchCourses("science", 0.1, 1000));
-        System.out.println(analyzer.recommendCourses(30, 1, 1));
 
-    }
-
-    public static String mapToString(Map<String, Integer> map) {
-        StringBuilder sb = new StringBuilder();
-        for (Map.Entry<String, Integer> entry : map.entrySet()) {
-            sb.append(entry.getKey()).append(" : ").append(entry.getValue()).append("\n");
-        }
-        return sb.toString();
-    }
 
 }
