@@ -27,7 +27,7 @@ public class LocalAnalyzerTest {
             if (constructor.getModifiers() != Modifier.PUBLIC) {
                 throw new NoSuchMethodException("The constructor from class OnlineCoursesAnalyzer is not public!");
             }
-            courseInfo = constructor.newInstance("resources/local.csv");
+            courseInfo = constructor.newInstance("C:\\Users\\jimmylaw21\\OneDrive - 南方科技大学\\桌面\\CS209 java2\\src\\main\\resources/local.csv");
         } catch (ClassNotFoundException | InvocationTargetException | InstantiationException |
                  IllegalAccessException | NoSuchMethodException e) {
             e.printStackTrace();
@@ -103,7 +103,7 @@ public class LocalAnalyzerTest {
             Method method = courseAnalyzerClass.getMethod("getPtcpCountByInst");
             Object res = method.invoke(courseInfo);
             assertTrue(res instanceof Map<?, ?>);
-            String expected = Files.readString(Paths.get("resources", "local_answer", "Q1.txt"),
+            String expected = Files.readString(Paths.get("C:\\Users\\jimmylaw21\\OneDrive - 南方科技大学\\桌面\\CS209 java2\\src\\main\\resources", "local_answer", "Q1.txt"),
                             StandardCharsets.UTF_8)
                     .replace("\r", "").strip();
             assertEquals(expected, mapToString(res));
@@ -120,7 +120,7 @@ public class LocalAnalyzerTest {
             Method method = courseAnalyzerClass.getMethod("getPtcpCountByInstAndSubject");
             Object res = method.invoke(courseInfo);
             assertTrue(res instanceof Map<?, ?>);
-            String expected = Files.readString(Paths.get("resources", "local_answer", "Q2.txt"),
+            String expected = Files.readString(Paths.get("C:\\Users\\jimmylaw21\\OneDrive - 南方科技大学\\桌面\\CS209 java2\\src\\main\\resources", "local_answer", "Q2.txt"),
                             StandardCharsets.UTF_8)
                     .replace("\r", "").strip();
             assertEquals(expected, mapToString(res));
@@ -137,7 +137,7 @@ public class LocalAnalyzerTest {
             Method method = courseAnalyzerClass.getMethod("getCourseListOfInstructor");
             Object res = method.invoke(courseInfo);
             assertTrue(res instanceof Map<?, ?>);
-            String expected = Files.readString(Paths.get("resources", "local_answer", "Q3.txt"),
+            String expected = Files.readString(Paths.get("C:\\Users\\jimmylaw21\\OneDrive - 南方科技大学\\桌面\\CS209 java2\\src\\main\\resources", "local_answer", "Q3.txt"),
                             StandardCharsets.UTF_8)
                     .replace("\r", "").strip();
             assertTrue(compareMapWithoutOrder(res, expected));
@@ -147,6 +147,45 @@ public class LocalAnalyzerTest {
             fail();
         }
     }
+    //比较两个map是否相等，不考虑顺序，如果不相等，返回不相等的元素
+    <K, V> String compareMap(Object obj, String expected) {
+        Map<K, V> objMap = (Map<K, V>) obj;
+        List<Item<K, V>> expectedList = new ArrayList<>();
+        String[] rows = expected.split("\n");
+        for (String row : rows) {
+            String[] strings = row.split(" == ");
+            expectedList.add((Item<K, V>) new Item<>(strings[0], strings[1]));
+        }
+        if (objMap.size() != expectedList.size()) {
+            return "size not equal";
+        }
+        for (Map.Entry<K, V> entry : objMap.entrySet()) {
+            Item<K, V> item = (Item<K, V>) new Item<>(entry.getKey().toString(), entry.getValue().toString());
+            if (!expectedList.contains(item)) {
+                return "not equal";
+            }
+        }
+        return "equal";
+    }
+    @Test
+    void testGetCourseListOfInstructor2() {
+        try {
+            Method method = courseAnalyzerClass.getMethod("getCourseListOfInstructor");
+            Object res = method.invoke(courseInfo);
+            assertTrue(res instanceof Map<?, ?>);
+            String expected = Files.readString(Paths.get("C:\\Users\\jimmylaw21\\OneDrive - 南方科技大学\\桌面\\CS209 java2\\src\\main\\resources", "local_answer", "Q3.txt"),
+                            StandardCharsets.UTF_8)
+                    .replace("\r", "").strip();
+            //比较两个map是否相等，不考虑顺序，如果不相等，返回不相等的元素
+            //使用compareMap方法
+            assertEquals("equal", compareMap(res, expected));
+        } catch (NoSuchMethodException | InvocationTargetException |
+                 IllegalAccessException | IOException e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
 
     @Test
     void testGetCourses() {
@@ -154,13 +193,13 @@ public class LocalAnalyzerTest {
             Method method = courseAnalyzerClass.getMethod("getCourses", int.class, String.class);
             Object res1 = method.invoke(courseInfo, 10, "hours");
             assertTrue(res1 instanceof List<?>);
-            String expected1 = Files.readString(Paths.get("resources", "local_answer", "Q4_1.txt"),
+            String expected1 = Files.readString(Paths.get("C:\\Users\\jimmylaw21\\OneDrive - 南方科技大学\\桌面\\CS209 java2\\src\\main\\resources", "local_answer", "Q4_1.txt"),
                             StandardCharsets.UTF_8)
                     .replace("\r", "").strip();
             assertEquals(expected1, listToString(res1));
             Object res2 = method.invoke(courseInfo, 15, "participants");
             assertTrue(res2 instanceof List<?>);
-            String expected2 = Files.readString(Paths.get("resources", "local_answer", "Q4_2.txt"),
+            String expected2 = Files.readString(Paths.get("C:\\Users\\jimmylaw21\\OneDrive - 南方科技大学\\桌面\\CS209 java2\\src\\main\\resources", "local_answer", "Q4_2.txt"),
                             StandardCharsets.UTF_8)
                     .replace("\r", "").strip();
             assertEquals(expected2, listToString(res2));
@@ -177,13 +216,13 @@ public class LocalAnalyzerTest {
             Method method = courseAnalyzerClass.getMethod("searchCourses", String.class, double.class, double.class);
             Object res1 = method.invoke(courseInfo, "computer", 20.0, 700);
             assertTrue(res1 instanceof List<?>);
-            String expected1 = Files.readString(Paths.get("resources", "local_answer", "Q5_1.txt"),
+            String expected1 = Files.readString(Paths.get("C:\\Users\\jimmylaw21\\OneDrive - 南方科技大学\\桌面\\CS209 java2\\src\\main\\resources", "local_answer", "Q5_1.txt"),
                             StandardCharsets.UTF_8)
                     .replace("\r", "").strip();
             assertEquals(expected1, listToString(res1));
             Object res2 = method.invoke(courseInfo, "SCIENCE", 25.0, 400);
             assertTrue(res2 instanceof List<?>);
-            String expected2 = Files.readString(Paths.get("resources", "local_answer", "Q5_2.txt"),
+            String expected2 = Files.readString(Paths.get("C:\\Users\\jimmylaw21\\OneDrive - 南方科技大学\\桌面\\CS209 java2\\src\\main\\resources", "local_answer", "Q5_2.txt"),
                             StandardCharsets.UTF_8)
                     .replace("\r", "").strip();
             assertEquals(expected2, listToString(res2));
@@ -200,19 +239,19 @@ public class LocalAnalyzerTest {
             Method method = courseAnalyzerClass.getMethod("recommendCourses", int.class, int.class, int.class);
             Object res1 = method.invoke(courseInfo, 25, 1, 1);
             assertTrue(res1 instanceof List<?>);
-            String expected1 = Files.readString(Paths.get("resources", "local_answer", "Q6_1.txt"),
+            String expected1 = Files.readString(Paths.get("C:\\Users\\jimmylaw21\\OneDrive - 南方科技大学\\桌面\\CS209 java2\\src\\main\\resources", "local_answer", "Q6_1.txt"),
                             StandardCharsets.UTF_8)
                     .replace("\r", "").strip();
             assertEquals(expected1, listToString(res1));
             Object res2 = method.invoke(courseInfo, 30, 0, 1);
             assertTrue(res2 instanceof List<?>);
-            String expected2 = Files.readString(Paths.get("resources", "local_answer", "Q6_2.txt"),
+            String expected2 = Files.readString(Paths.get("C:\\Users\\jimmylaw21\\OneDrive - 南方科技大学\\桌面\\CS209 java2\\src\\main\\resources", "local_answer", "Q6_2.txt"),
                             StandardCharsets.UTF_8)
                     .replace("\r", "").strip();
             assertEquals(expected2, listToString(res2));
             Object res3 = method.invoke(courseInfo, 35, 1, 0);
             assertTrue(res3 instanceof List<?>);
-            String expected3 = Files.readString(Paths.get("resources", "local_answer", "Q6_3.txt"),
+            String expected3 = Files.readString(Paths.get("C:\\Users\\jimmylaw21\\OneDrive - 南方科技大学\\桌面\\CS209 java2\\src\\main\\resources", "local_answer", "Q6_3.txt"),
                             StandardCharsets.UTF_8)
                     .replace("\r", "").strip();
             assertEquals(expected3, listToString(res3));

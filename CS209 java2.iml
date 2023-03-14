@@ -3,7 +3,7 @@
   <component name="CheckStyle-IDEA-Module" serialisationVersion="2">
     <option name="activeLocationsIds" />
   </component>
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_17">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
@@ -13,7 +13,7 @@
       <sourceFolder url="file://$MODULE_DIR$/target/generated-sources/annotations" isTestSource="false" generated="true" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="17 (2)" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Maven: org.openjdk.jmh:jmh-generator-annprocess:1.35" level="project" />
     <orderEntry type="library" name="Maven: org.openjdk.jmh:jmh-core:1.35" level="project" />

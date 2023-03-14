@@ -9,8 +9,8 @@
         <module name="CS209 java2" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="CS209 java2" target="1.8" />
+    <bytecodeTargetLevel target="17">
+      <module name="CS209 java2" target="17" />
     </bytecodeTargetLevel>
   </component>
 </project>
