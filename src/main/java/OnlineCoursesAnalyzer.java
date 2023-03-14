@@ -150,7 +150,6 @@ public class OnlineCoursesAnalyzer {
     }
 
     public List<String> recommendCourses(int age, int gender, int isBachelorOrHigher){
-        //遇到相同的course number，更新stat中的age, gender, isBachelorOrHigher，这三个值是同course number的所有course的平均值，stat中的course为Launch Date最新的course
         List<List<Course>> courseList = courses.stream()
                 .collect(Collectors.groupingBy(Course::getCourseNumber))
                 .entrySet().stream()
@@ -158,23 +157,31 @@ public class OnlineCoursesAnalyzer {
                         .sorted(Comparator.comparing(Course::getLaunchDate).reversed())
                         .collect(Collectors.toList()))
                 .collect(Collectors.toList());
-        List<CourseStats> courseStatsList = new ArrayList<>();
-        for (List<Course> list : courseList) {
-            CourseStats courseStats = new CourseStats(list.get(0));
-            for (int i = 1; i < list.size(); i++) {
-                courseStats.medianAge += list.get(i).getMedianAge();
-                courseStats.malePercent += list.get(i).getMalePercent();
-                courseStats.bachelorsOrHigherPercent += list.get(i).getBachelorsOrHigherPercent();
-                if (list.get(i).getLaunchDate().compareTo(courseStats.course.getLaunchDate()) > 0) {
-                    courseStats.course = list.get(i);
-                }
-            }
-            courseStats.medianAge /= list.size();
-            courseStats.malePercent /= list.size();
-            courseStats.bachelorsOrHigherPercent /= list.size();
-            courseStats.similarity = Math.pow(age-courseStats.medianAge, 2) + Math.pow(gender*100-courseStats.malePercent, 2) + Math.pow(isBachelorOrHigher*100-courseStats.bachelorsOrHigherPercent, 2);
-            courseStatsList.add(courseStats);
-        }
+
+        List<CourseStats> courseStatsList = courseList.stream()
+                .map(list -> {
+                    double avgMedianAge = 0.0;
+                    double avgMalePercent = 0.0;
+                    double avgBachelorsOrHigherPercent = 0.0;
+                    double similarity;
+                    Course latestCourse = list.get(0);
+                    for (int i = 0; i < list.size(); i++) {
+                        avgMedianAge += list.get(i).getMedianAge();
+                        avgMalePercent += list.get(i).getMalePercent();
+                        avgBachelorsOrHigherPercent += list.get(i).getBachelorsOrHigherPercent();
+                        if (list.get(i).getLaunchDate().compareTo(latestCourse.getLaunchDate()) > 0) {
+                            latestCourse = list.get(i);
+                        }
+                    }
+                    avgMedianAge /= list.size();
+                    avgMalePercent /= list.size();
+                    avgBachelorsOrHigherPercent /= list.size();
+                    similarity = Math.pow(age-avgMedianAge, 2) + Math.pow(gender*100-avgMalePercent, 2) + Math.pow(isBachelorOrHigher*100-avgBachelorsOrHigherPercent, 2);
+                    CourseStats courseStats = new CourseStats(latestCourse,avgMalePercent, avgMedianAge, avgBachelorsOrHigherPercent, similarity);
+                    return courseStats;
+                })
+                .collect(Collectors.toList());
+
         return courseStatsList.stream()
                 .sorted(Comparator.comparing(CourseStats::getSimilarity).thenComparing(CourseStats::getCourseTitle))
                 .map(CourseStats::getCourseTitle)
@@ -195,6 +202,14 @@ public class OnlineCoursesAnalyzer {
             this.medianAge = course.getMedianAge();
             this.malePercent = course.getMalePercent();
             this.bachelorsOrHigherPercent = course.getBachelorsOrHigherPercent();
+        }
+
+        public CourseStats(Course course, double medianAge, double malePercent, double bachelorsOrHigherPercent, double similarity) {
+            this.course = course;
+            this.medianAge = medianAge;
+            this.malePercent = malePercent;
+            this.bachelorsOrHigherPercent = bachelorsOrHigherPercent;
+            this.similarity = similarity;
         }
 
         public String getCourseTitle() {
